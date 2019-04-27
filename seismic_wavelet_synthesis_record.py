@@ -12,14 +12,11 @@ class synthetic_seismic_record():
                 self.density = []
                 self.velocity = []
                 self.row = 0
-                self.col = 0
                 self.reflection_coefficient_sequence = []
                 self.acquire_data()
 
 
-        def acquire_data(self):
-        
-        
+        def acquire_data(self):        
                 files = xlrd.open_workbook(self.filename)
                 sheet1 = files.sheet_by_name("Sheet1")
                 self.row=sheet1.nrows-1
@@ -34,38 +31,36 @@ class synthetic_seismic_record():
                         self.reflection_coefficient_sequence.append((pv2-pv1)/(pv1+pv2))
 
 
-
-
-        def ricker_synthesis_graph(self):                
+        def ricker_synthesis_graph(self):
+                #雷克子波抽样
+                fm = 50
+                dt = 0.001
+                r = 4
+                ricker = []
+                for i in range(100):
+                        ricker.append(math.exp(-(2*math.pi*fm/r)**2*(i*dt)**2)*math.cos(2*math.pi*fm*i*dt))
+                #反射系数
                 t_list = []
-                dt = 0.01
                 for i in range(self.row-1):
                         if i == 0:
-
-                                t_list.append(self.depth[i]/self.velocity[i])
+                                t_list.append(2*(self.depth[i]/self.velocity[i]))
                         else:
-                                t_list.append((self.depth[i]-self.depth[i-1])/self.velocity[i]+t_list[-1])
+                                t_list.append(2*((self.depth[i]-self.depth[i-1])/self.velocity[i])+t_list[-1])
                 reflection_c_s=np.zeros(round(t_list[-1]/dt)+1)
                 for i in range(len(self.reflection_coefficient_sequence)):
                         reflection_c_s[round(t_list[i]/dt)] = self.reflection_coefficient_sequence[i]
-                fm = 50
-                r = 6
-                ricker = []
-                result = []
-                for i in range(200):
-                        ricker.append(math.exp(-(2*math.pi*fm/r)**2*(i*dt)**2)*math.sin(2*math.pi*fm*i*dt))
+
+                #卷积
                 result = np.convolve(reflection_c_s,ricker)
+                #作图
                 T = np.array(range(len(result)))
                 power = np.array(result)
                 xnew = np.linspace(T.min(),T.max(),300) 
                 power_smooth = spline(T,power,xnew)
                 plt.plot(xnew,power_smooth)
-                plt.title("ricker_synthesis_graph")
                 plt.show()
 
                 
-
-
         def depth_velocity_graph(self):
                 d1 = []
                 v1 = []
@@ -84,30 +79,7 @@ class synthetic_seismic_record():
 
         
         def all_graph(self):
-                t_list = []
-                dt = 0.01
-                for i in range(self.row-1):
-                        if i == 0:
-
-                                t_list.append(self.depth[i]/self.velocity[i])
-                        else:
-                                t_list.append((self.depth[i]-self.depth[i-1])/self.velocity[i]+t_list[-1])
-                reflection_c_s=np.zeros(round(t_list[-1]/dt)+1)
-                for i in range(len(self.reflection_coefficient_sequence)):
-                        reflection_c_s[round(t_list[i]/dt)] = self.reflection_coefficient_sequence[i]
-                fm = 50
-                r = 6
-                ricker = []
-                result = []
-                for i in range(200):
-                        ricker.append(math.exp(-(2*math.pi*fm/r)**2*(i*dt)**2)*math.sin(2*math.pi*fm*i*dt))
-                result = np.convolve(reflection_c_s,ricker)
-                T = np.array(range(len(result)))
-                power = np.array(result)
-                xnew = np.linspace(T.min(),T.max(),300) 
-                power_smooth = spline(T,power,xnew)
-
-
+                #速度深度图
                 d1 = []
                 v1 = []
                 for i in range(self.row-1):
@@ -119,20 +91,46 @@ class synthetic_seismic_record():
                                 d1.append(-self.depth[i])                       
                         v1.append(self.velocity[i])
                         v1.append(self.velocity[i])
-                plt.subplot(121)
+                #雷克子波抽样
+                fm = 50
+                dt = 0.001
+                r = 4
+                ricker = []
+                for i in range(100):
+                        ricker.append(math.exp(-(2*math.pi*fm/r)**2*(i*dt)**2)*math.sin(2*math.pi*fm*i*dt))
+                #反射系数
+                t_list = []
+                for i in range(self.row-1):
+                        if i == 0:
+
+                                t_list.append(2*(self.depth[i]/self.velocity[i]))
+                        else:
+                                t_list.append(2*((self.depth[i]-self.depth[i-1])/self.velocity[i])+t_list[-1])
+                reflection_c_s=np.zeros(round(t_list[-1]/dt)+1)
+                for i in range(len(self.reflection_coefficient_sequence)):
+                        reflection_c_s[round(t_list[i]/dt)] = self.reflection_coefficient_sequence[i]
+
+                #卷积
+                result = np.convolve(reflection_c_s,ricker)
+                #作图
+                T = np.array(range(len(result)))
+                power = np.array(result)
+                xnew = np.linspace(T.min(),T.max(),300) 
+                power_smooth = spline(T,power,xnew)
+
+                plt.subplot(223)
                 plt.plot(v1,d1,'r')
-                plt.subplot(122)
+                plt.subplot(221)
+                plt.plot(ricker)
+                plt.subplot(222)
+                plt.stem(ricker)
+                plt.subplot(224)
                 plt.plot(xnew,power_smooth,'b')
                 plt.show()
 
 
-
-        
-
-
-
 if __name__ == "__main__":
-        a=synthetic_seismic_record("/home/xxx/documents/data.xlsx")
+        a=synthetic_seismic_record("/home/xxx/documnts/data.xlsx")
         # a.depth_velocity_graph()
         # a.ricker_synthesis_graph()
         a.all_graph()
