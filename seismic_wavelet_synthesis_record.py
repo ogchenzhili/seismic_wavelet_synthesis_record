@@ -38,7 +38,7 @@ class synthetic_seismic_record():
                 r = 4
                 ricker = []
                 for i in range(100):
-                        ricker.append(math.exp(-(2*math.pi*fm/r)**2*(i*dt)**2)*math.cos(2*math.pi*fm*i*dt))
+                        ricker.append(math.exp(-(2*math.pi*fm/r)**2*(i*dt)**2)*math.sin(2*math.pi*fm*i*dt))
                 #反射系数
                 t_list = []
                 for i in range(self.row-1):
@@ -130,7 +130,7 @@ class synthetic_seismic_record():
 
 
 if __name__ == "__main__":
-        a=synthetic_seismic_record("/home/xxx/documnts/data.xlsx")
+        a=synthetic_seismic_record("/home/czl/code/python/seismic_wavelet_synthesis_record/data.xlsx")
         # a.depth_velocity_graph()
         # a.ricker_synthesis_graph()
         a.all_graph()
