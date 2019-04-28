@@ -38,7 +38,7 @@ class synthetic_seismic_record():
                 r = 4
                 ricker = []
                 for i in range(100):
-                        ricker.append(math.exp(-(2*math.pi*fm/r)**2*(i*dt)**2)*math.sin(2*math.pi*fm*i*dt))
+                        ricker.append(math.exp(-(math.pi*fm*(t*dt-1/fm))**2)*(1-2*(math.pi*fm*(t*dt-1/fm))**2))
                 #反射系数
                 t_list = []
                 for i in range(self.row-1):
@@ -94,10 +94,9 @@ class synthetic_seismic_record():
                 #雷克子波抽样
                 fm = 50
                 dt = 0.001
-                r = 4
                 ricker = []
-                for i in range(100):
-                        ricker.append(math.exp(-(2*math.pi*fm/r)**2*(i*dt)**2)*math.sin(2*math.pi*fm*i*dt))
+                for t in range(100):
+                        ricker.append(math.exp(-(math.pi*fm*(t*dt-1/fm))**2)*(1-2*(math.pi*fm*(t*dt-1/fm))**2))
                 #反射系数
                 t_list = []
                 for i in range(self.row-1):
