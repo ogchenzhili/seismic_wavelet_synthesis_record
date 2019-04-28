@@ -129,7 +129,7 @@ class synthetic_seismic_record():
 
 
 if __name__ == "__main__":
-        a=synthetic_seismic_record("/home/czl/code/python/seismic_wavelet_synthesis_record/data.xlsx")
+        a=synthetic_seismic_record("/home/xxx/data.xlsx")
         # a.depth_velocity_graph()
         # a.ricker_synthesis_graph()
         a.all_graph()
