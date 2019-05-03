@@ -29,6 +29,14 @@ class synthetic_seismic_record():
                         pv2 = self.density[i+1]*self.velocity[i+1]
                         pv1 = self.density[i]*self.velocity[i]
                         self.reflection_coefficient_sequence.append((pv2-pv1)/(pv1+pv2))
+        
+
+        def slip(self, y):
+                T = np.array(range(len(y)))
+                power = np.array(y)
+                xnew = np.linspace(T.min(), T.max(), 300)
+                power_smooth = spline(T, power, xnew)
+                return xnew, power_smooth
 
 
         def ricker_synthesis_graph(self):
@@ -118,23 +126,24 @@ class synthetic_seismic_record():
 
                 #卷积
                 result = np.convolve(reflection_c_s, ricker)
-                #作图
-                T = np.array(range(len(result)))
-                power = np.array(result)
-                xnew = np.linspace(T.min(), T.max(), 300) 
-                power_smooth = spline(T, power, xnew)
+                
+                #雷克子波作平滑图
+                ricker_x, ricker_y = self.slip(ricker)
+
+                #合成作平滑图
+                synthesis_x, synthesis_y = self.slip(result)
 
                 plt.subplot(223)
                 plt.plot(v1, d1, 'r')
                 plt.subplot(221)
-                plt.plot(ricker)
+                plt.plot(ricker_x, ricker_y, 'b')
                 plt.subplot(222)
                 plt.stem(ricker)
                 plt.subplot(224)
-                plt.plot(xnew, power_smooth, 'b')
+                plt.plot(synthesis_x,synthesis_y, 'b')
                 plt.show()
 
 
 if __name__ == "__main__":
-        a=synthetic_seismic_record("/home/czl/code/python/data.xlsx")
+        a=synthetic_seismic_record("/home/xxx/code/python/data.xlsx")
         a.all_graph()
